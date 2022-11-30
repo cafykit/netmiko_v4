@@ -26,6 +26,8 @@ from netmiko.cisco import (
     CiscoIosFileTransfer,
     CiscoIosTelnet,
     CiscoIosSerial,
+    CiscoBspSSH,
+    CiscoBspTelnet,
 )
 from netmiko.cisco import CiscoNxosSSH, CiscoNxosFileTransfer
 from netmiko.cisco import CiscoS300SSH, CiscoS300Telnet
@@ -154,6 +156,8 @@ CLASS_MAPPER_BASE = {
     "cisco_wlc": CiscoWlcSSH,
     "cisco_xe": CiscoIosSSH,
     "cisco_xr": CiscoXrSSH,
+    "cisco_bsp": CiscoBspSSH,
+    "cisco_bsp_telnet": CiscoBspTelnet,
     "cloudgenix_ion": CloudGenixIonSSH,
     "coriant": CoriantSSH,
     "dell_dnos9": DellForce10SSH,
