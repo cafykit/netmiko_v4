@@ -157,7 +157,6 @@ CLASS_MAPPER_BASE = {
     "cisco_xe": CiscoIosSSH,
     "cisco_xr": CiscoXrSSH,
     "cisco_bsp": CiscoBspSSH,
-    "cisco_bsp_telnet": CiscoBspTelnet,
     "cloudgenix_ion": CloudGenixIonSSH,
     "coriant": CoriantSSH,
     "dell_dnos9": DellForce10SSH,
@@ -282,6 +281,7 @@ CLASS_MAPPER["ciena_saos_telnet"] = CienaSaosTelnet
 CLASS_MAPPER["cisco_ios_telnet"] = CiscoIosTelnet
 CLASS_MAPPER["cisco_xr_telnet"] = CiscoXrTelnet
 CLASS_MAPPER["cisco_s300_telnet"] = CiscoS300Telnet
+CLASS_MAPPER["cisco_bsp_telnet"] = CiscoBspTelnet
 CLASS_MAPPER["dell_dnos6_telnet"] = DellDNOS6Telnet
 CLASS_MAPPER["dell_powerconnect_telnet"] = DellPowerConnectTelnet
 CLASS_MAPPER["dlink_ds_telnet"] = DlinkDSTelnet
