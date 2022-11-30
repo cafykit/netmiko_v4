@@ -1320,6 +1320,20 @@ A paramiko SSHException occurred during connection creation:
                     self.write_channel(self.RETURN)
                     time.sleep(sleep_time)
                     prompt = self.read_channel().strip()
+
+                    vxr_pattern = "last login"
+                    if vxr_pattern in prompt.lower():
+                        time.sleep((delay_factor * 0.1) + 3)
+                        prompt = self.read_channel()
+                    autocommand_pattern = "executing autocommand"
+                    if autocommand_pattern in prompt.lower():
+                        time.sleep((delay_factor * 0.1) + 5)
+                        prompt = self.read_channel()
+                    cxr_pattern = "last switch-over"
+                    if cxr_pattern in prompt.lower():
+                        time.sleep((delay_factor * 0.1) + 3)
+                        prompt = self.read_channel()
+
                     if sleep_time <= 3:
                         # Double the sleep_time when it is small
                         sleep_time *= 2
