@@ -1,0 +1,14 @@
+*.pyc
+*.swp
+
+./build/*
+.cache
+__pycache__/
+*.egg-info/
+
+.idea/*
+.vscode/*
+
+*.DS_Store
+*.egg
+venv/
