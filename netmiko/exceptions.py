@@ -54,3 +54,15 @@ class ReadTimeout(ReadException):
     """General exception indicating an error occurred during a Netmiko read operation."""
 
     pass
+
+
+class PatternNotFoundException(Exception):
+    """Raise when pattern is not found"""
+
+    def __init__(self, *args: list, output: str = '', **kwargs: dict) -> None:
+        """
+        @param output: output of the send_command.
+        This output can help caller to analyze what was wrong with pattern
+        """
+        self.output = output
+        super().__init__(*args, **kwargs)
