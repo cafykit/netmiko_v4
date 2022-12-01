@@ -44,6 +44,8 @@ class CiscoBaseConnection(BaseConnection):
         pattern: str = "",
         re_flags: int = 0,
     ) -> str:
+        if not pattern:
+            pattern = re.escape(self.base_prompt[:16])
         return super().config_mode(
             config_command=config_command, pattern=pattern, re_flags=re_flags
         )
