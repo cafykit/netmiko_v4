@@ -2,10 +2,12 @@
 from typing import Optional
 import re
 import time
+import logging
 from netmiko.base_connection import BaseConnection
 from netmiko.scp_handler import BaseFileTransfer
 from netmiko.exceptions import NetmikoAuthenticationException
 
+log = logging.getLogger('netmiko')
 
 class CiscoBaseConnection(BaseConnection):
     """Base Class for cisco-like behavior."""
@@ -178,9 +180,6 @@ class CiscoBaseConnection(BaseConnection):
                         ''' Session is standby state '''
                         return return_msg
 
-
-
-
                     # Search for username pattern / send username
                     # If the prompt shows "xr login:", the you can directly login to xr using xr username
                     # and password or you can login to linux host, using linux host's username password
@@ -201,8 +200,6 @@ class CiscoBaseConnection(BaseConnection):
                         return_msg += output
                         log.debug("After sending username, the output pattern is={}".format(output))
                         log.debug("________________________________________________")
-                        # print("After sending username, the output pattern is=", output)
-                        # print ("__________________________________________")
                     else:
                         xr_or_host_login_pattern = "xr login:"
                         xr_or_host_login_alt_pattern = "ios login:"
@@ -267,15 +264,15 @@ class CiscoBaseConnection(BaseConnection):
                         )
                         raise NetmikoAuthenticationException(msg)
 
-                    if re.search(rebooted_bmc_prompt_pattern, output) or re.search(bmc_prompt_pattern,
-                                                                                   output) or re.search(
-                            x86_prompt_pattern, output):
+                    if re.search(rebooted_bmc_prompt_pattern, output) or \
+                            re.search(bmc_prompt_pattern, output) or \
+                            re.search(x86_prompt_pattern, output):
                         is_spitfire = True
 
                     # Check if proper data received
                     if re.search(
                         pri_prompt_terminator, output, flags=re.M
-                    ) or re.search(alt_prompt_terminator, output, flags=re.M) and is_spitfire == False:
+                    ) or re.search(alt_prompt_terminator, output, flags=re.M) and not is_spitfire:
                         return return_msg
 
                     i += 1
