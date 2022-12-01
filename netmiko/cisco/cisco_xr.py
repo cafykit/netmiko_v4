@@ -39,6 +39,9 @@ class CiscoXrBase(CiscoBaseConnection):
         label: str = "",
         read_timeout: float = 120.0,
         delay_factor: Optional[float] = None,
+        force=False,
+        best_effort=False,
+        replace=False,
     ) -> str:
         """
         Commit the candidate configuration.
@@ -53,6 +56,10 @@ class CiscoXrBase(CiscoBaseConnection):
             command_string = commit comment <comment>
 
         delay_factor: Deprecated in Netmiko 4.x. Will be eliminated in Netmiko 5.
+
+        force: Commit will be forcefully applied
+        best_effort: Commit will be applied with the best effort
+        replace:
 
         supported combinations
         label and confirm:
@@ -105,27 +112,53 @@ class CiscoXrBase(CiscoBaseConnection):
         else:
             command_string = "commit"
 
+        if force:
+            command_string = command_string.replace("commit", "commit force")
+        if best_effort:
+            command_string = command_string.replace("commit", "commit best-effort")
+        if replace:
+            command_string = command_string.replace("commit", "commit replace")
+        print(f"command string is {command_string}")
+
         # Enter config mode (if necessary)
         output = self.config_mode()
 
-        # IOS-XR might do this:
-        # This could be a few minutes if your config is large. Confirm? [y/n][confirm]
-        new_data = self._send_command_str(
-            command_string,
-            expect_string=r"(#|onfirm)",
-            strip_prompt=False,
-            strip_command=False,
-            read_timeout=read_timeout,
-        )
-        if "onfirm" in new_data:
-            output += new_data
+        if replace:
             new_data = self._send_command_str(
-                "y",
-                expect_string=r"#",
+                command_string,
+                expect_string=r"This commit will replace or remove the entire running configuration",
                 strip_prompt=False,
                 strip_command=False,
                 read_timeout=read_timeout,
             )
+            if "This commit will replace or remove the entire running configuration" in new_data:
+                output += new_data
+                new_data = self._send_command_str(
+                    "yes",
+                    expect_string=r"#",
+                    strip_prompt=False,
+                    strip_command=False,
+                    read_timeout=read_timeout,
+                )
+        else:
+            # IOS-XR might do this:
+            # This could be a few minutes if your config is large. Confirm? [y/n][confirm]
+            new_data = self._send_command_str(
+                command_string,
+                expect_string=r"(#|onfirm)",
+                strip_prompt=False,
+                strip_command=False,
+                read_timeout=read_timeout,
+            )
+            if "onfirm" in new_data:
+                output += new_data
+                new_data = self._send_command_str(
+                    "y",
+                    expect_string=r"#",
+                    strip_prompt=False,
+                    strip_command=False,
+                    read_timeout=read_timeout,
+                )
         output += new_data
         if error_marker in output:
             raise ValueError(f"Commit failed with the following errors:\n\n{output}")
