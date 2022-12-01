@@ -123,24 +123,42 @@ class CiscoXrBase(CiscoBaseConnection):
         # Enter config mode (if necessary)
         output = self.config_mode()
 
-        # IOS-XR might do this:
-        # This could be a few minutes if your config is large. Confirm? [y/n][confirm]
-        new_data = self._send_command_str(
-            command_string,
-            expect_string=r"(#|onfirm)",
-            strip_prompt=False,
-            strip_command=False,
-            read_timeout=read_timeout,
-        )
-        if "onfirm" in new_data:
-            output += new_data
+        if replace:
             new_data = self._send_command_str(
-                "y",
-                expect_string=r"#",
+                command_string,
+                expect_string=r"This commit will replace or remove the entire running configuration",
                 strip_prompt=False,
                 strip_command=False,
                 read_timeout=read_timeout,
             )
+            if "This commit will replace or remove the entire running configuration" in new_data:
+                output += new_data
+                new_data = self._send_command_str(
+                    "yes",
+                    expect_string=r"#",
+                    strip_prompt=False,
+                    strip_command=False,
+                    read_timeout=read_timeout,
+                )
+        else:
+            # IOS-XR might do this:
+            # This could be a few minutes if your config is large. Confirm? [y/n][confirm]
+            new_data = self._send_command_str(
+                command_string,
+                expect_string=r"(#|onfirm)",
+                strip_prompt=False,
+                strip_command=False,
+                read_timeout=read_timeout,
+            )
+            if "onfirm" in new_data:
+                output += new_data
+                new_data = self._send_command_str(
+                    "y",
+                    expect_string=r"#",
+                    strip_prompt=False,
+                    strip_command=False,
+                    read_timeout=read_timeout,
+                )
         output += new_data
         if error_marker in output:
             raise ValueError(f"Commit failed with the following errors:\n\n{output}")
